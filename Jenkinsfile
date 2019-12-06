@@ -30,6 +30,15 @@ pipeline {
             sh 'cat /var/lib/jenkins/OWASP-Dependency-Check/reports/dependency-check-report.xml'
              }
         }
+        
+        stage ('SAST'){
+            steps{
+                withSonarQubeEnv('devsecops'){
+                    sh 'mvn sonar:sonar'
+                    sh 'cat target/sonar/report-task.txt'
+                }
+            }
+        }
 
         stage ('Build') {
         steps {
@@ -39,7 +48,7 @@ pipeline {
          stage ('Deploy-To-Tomcat') {
             steps {
            sshagent(['tomcat']) {
-                sh 'scp -o StrictHostKeyChecking=no target/*.war ubuntu@52.50.30.117:/home/ubuntu/prod/apache-tomcat-9.0.29/webapps/webapp.war'
+                sh 'scp -o StrictHostKeyChecking=no target/*.war ubuntu@54.154.229.146:/home/ubuntu/prod/apache-tomcat-9.0.29/webapps/webapp.war'
               }      
            }       
     }
